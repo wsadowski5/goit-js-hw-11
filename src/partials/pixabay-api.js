@@ -20,7 +20,9 @@ export const fetchImages = async (query, page) => {
    
             },
         });
-        console.log(response.data)
+        
+        let data = response.data
+        return data
     } catch (error) {
         console.error('ERROR:', error);
         throw error;
