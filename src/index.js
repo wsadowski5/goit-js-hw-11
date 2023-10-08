@@ -1,5 +1,3 @@
-
-
 import Notiflix from "notiflix";
 import { fetchImages } from "./partials/pixabay-api";
 
@@ -8,34 +6,26 @@ const form = document.querySelector('form')
 const gallery = document.querySelector('.gallery')
 const loadMoreBtn = document.querySelector('.load-more')
 
-
 loadMoreBtn.classList.add('is-hidden')
 let query =  ''
 let page = 1
-let perPage = 4
-
-fetchImages(query,page)
+let perPage = 40
 
 function clearGallery() {
     gallery.innerHTML = '';
   }
 
-
 function renderGallery (event) {
     event.preventDefault();
     clearGallery();
-    
     const newQuery = input.value;
-    
     if (newQuery === query ) {
-                page ++
-                
+                page ++  
             }
             else {
                 query = newQuery
                 page = 1;
             } 
-                
     fetchImages(query,page,perPage)
     .then(images => {
       console.log(images)
@@ -56,14 +46,12 @@ function renderGallery (event) {
 
 function loadMoreImages(images) {
   page += 1
-
   fetchImages(query,page,perPage)
   .then(images =>{
     createGallery(images);
-    // if ()
+
   })
 }
-
 
 function createGallery(images) {
   const markup = images.hits
@@ -87,13 +75,15 @@ function createGallery(images) {
       </div>`
       })
       .join("")
-      gallery.insertAdjacentHTML('beforeend',markup)
-      const displayedHits = document.getElementsByClassName('info');
-      if(displayedHits < 500){
-        console.log ('abba')
+      gallery.insertAdjacentHTML('beforeend',markup);
+      const displayedHits = document.getElementsByClassName('info').length;
+      if(displayedHits > images.totalHits){
+        loadMoreBtn.classList.add('is-hidden');
+        Notiflix.Notify.failure(
+          "We're sorry, but you've reached the end of search results."
+        );
       }
-      
-    } 
+} 
 
 loadMoreBtn.addEventListener('click', loadMoreImages);
 
