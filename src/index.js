@@ -6,6 +6,7 @@ const form = document.querySelector('form')
 const gallery = document.querySelector('.gallery')
 const loadMoreBtn = document.querySelector('.load-more')
 
+
 loadMoreBtn.classList.add('is-hidden')
 let query =  ''
 let page = 1
@@ -19,16 +20,13 @@ function renderGallery (event) {
     event.preventDefault();
     clearGallery();
     const newQuery = input.value;
-    if (newQuery === query ) {
-                page ++  
-            }
-            else {
-                query = newQuery
-                page = 1;
-            } 
+    if (newQuery !== query ) {
+      query = newQuery
+      page = 1;
+      console.log(query)
+    }
     fetchImages(query,page,perPage)
     .then(images => {
-      console.log(images)
       if (images.totalHits === 0) {
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
@@ -36,20 +34,20 @@ function renderGallery (event) {
       } else {
         createGallery(images);
         Notiflix.Notify.success(`Hooray! We found ${images.totalHits} images.`);
-        if (images.totalHits > perPage) {
-          loadMoreBtn.classList.remove('is-hidden');
-        }
+      }
+      if (images.totalHits > perPage) {
+        console.log(images)
+        loadMoreBtn.classList.remove('is-hidden');
       }
     })
     .catch(error => console.log(error));
 }
 
-function loadMoreImages(images) {
+function loadMoreImages() {
   page += 1
   fetchImages(query,page,perPage)
   .then(images =>{
     createGallery(images);
-
   })
 }
 
@@ -77,7 +75,7 @@ function createGallery(images) {
       .join("")
       gallery.insertAdjacentHTML('beforeend',markup);
       const displayedHits = document.getElementsByClassName('info').length;
-      if(displayedHits > images.totalHits){
+      if(displayedHits === images.totalHits){
         loadMoreBtn.classList.add('is-hidden');
         Notiflix.Notify.failure(
           "We're sorry, but you've reached the end of search results."
