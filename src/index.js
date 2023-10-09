@@ -1,3 +1,17 @@
+
+import simpleLightbox from "simplelightbox";
+
+import "simplelightbox/dist/simple-lightbox.min.css";
+const lightbox = new simpleLightbox('.gallery a');
+
+// const lightbox = new SimpleLightbox('.gallery a',{
+//   captions : true,
+//   captionsType : 'attr',
+//   captionsData : 'alt',
+//   captionDelay : '250'
+// } )
+
+
 import Notiflix from "notiflix";
 import { fetchImages } from "./partials/pixabay-api";
 
@@ -19,11 +33,11 @@ function clearGallery() {
 function renderGallery (event) {
     event.preventDefault();
     clearGallery();
+
     const newQuery = input.value;
     if (newQuery !== query ) {
       query = newQuery
       page = 1;
-      console.log(query)
     }
     fetchImages(query,page,perPage)
     .then(images => {
@@ -33,10 +47,10 @@ function renderGallery (event) {
         );
       } else {
         createGallery(images);
+        lightbox.refresh();
         Notiflix.Notify.success(`Hooray! We found ${images.totalHits} images.`);
       }
       if (images.totalHits > perPage) {
-        console.log(images)
         loadMoreBtn.classList.remove('is-hidden');
       }
     })
@@ -48,6 +62,7 @@ function loadMoreImages() {
   fetchImages(query,page,perPage)
   .then(images =>{
     createGallery(images);
+    lightbox.refresh();
   })
 }
 
@@ -55,22 +70,24 @@ function createGallery(images) {
   const markup = images.hits
   .map(({webformatURL,largeImageURL,tags,likes,comments,views,downloads}) => {
     return `<div class="photo-card">
-        <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-        <div class="info">
-          <p class="info-item">
-            <b>Likes: ${likes}</b>
-          </p>
-          <p class="info-item">
-            <b>Views: ${views}</b>
-          </p>
-          <p class="info-item">
-            <b>Comments: ${comments}</b>
-          </p>
-          <p class="info-item">
-            <b>Downloads: ${downloads}</b>
-          </p>
-        </div>
-      </div>`
+              <a href="${largeImageURL}">
+                <img src="${webformatURL}" alt="${tags}" loading="lazy"/> 
+              </a>
+              <div class="info">
+                <p class="info-item">
+                  <b>Likes: ${likes}</b>
+                </p>
+                <p class="info-item">
+                  <b>Views: ${views}</b>
+                </p>
+                <p class="info-item">
+                  <b>Comments: ${comments}</b>
+                </p>
+                <p class="info-item">
+                  <b>Downloads: ${downloads}</b>
+                </p>
+              </div>
+            </div>`
       })
       .join("")
       gallery.insertAdjacentHTML('beforeend',markup);

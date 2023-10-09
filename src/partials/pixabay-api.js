@@ -1,7 +1,7 @@
 import axios from "axios";
 const url = 'https://pixabay.com/api/';
 
-
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 //------------------ axios fetch ------------------
 
