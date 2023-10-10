@@ -4,14 +4,6 @@ import simpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 const lightbox = new simpleLightbox('.gallery a');
 
-// const lightbox = new SimpleLightbox('.gallery a',{
-//   captions : true,
-//   captionsType : 'attr',
-//   captionsData : 'alt',
-//   captionDelay : '250'
-// } )
-
-
 import Notiflix from "notiflix";
 import { fetchImages } from "./partials/pixabay-api";
 
@@ -19,6 +11,13 @@ const input = document.querySelector('input')
 const form = document.querySelector('form')
 const gallery = document.querySelector('.gallery')
 const loadMoreBtn = document.querySelector('.load-more')
+
+// import InfiniteScroll from "infinite-scroll";
+// let infScroll = new InfiniteScroll(gallery, {
+//   path: '.gallery',
+//   append: '.photo-card',
+//   history: false,
+// })
 
 
 loadMoreBtn.classList.add('is-hidden')
@@ -30,16 +29,15 @@ function clearGallery() {
     gallery.innerHTML = '';
   }
 
-function renderGallery (event) {
+async function renderGallery (event) {
     event.preventDefault();
-    clearGallery();
-
-    const newQuery = input.value;
+    const newQuery = await input.value;
     if (newQuery !== query ) {
       query = newQuery
       page = 1;
     }
-    fetchImages(query,page,perPage)
+    await clearGallery();
+    await fetchImages(query,page,perPage)
     .then(images => {
       if (images.totalHits === 0) {
         Notiflix.Notify.failure(
@@ -57,12 +55,23 @@ function renderGallery (event) {
     .catch(error => console.log(error));
 }
 
-function loadMoreImages() {
+async function loadMoreImages() {
   page += 1
-  fetchImages(query,page,perPage)
+  await fetchImages(query,page,perPage)
   .then(images =>{
     createGallery(images);
     lightbox.refresh();
+
+    const { height: cardHeight } = document
+  .querySelector(".gallery")
+  .firstElementChild.getBoundingClientRect();
+
+ window.scrollBy({
+  top: cardHeight * 2,
+  behavior: "smooth",
+
+});
+
   })
 }
 
